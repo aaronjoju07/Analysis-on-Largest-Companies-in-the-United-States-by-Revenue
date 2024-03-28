@@ -1,34 +1,9 @@
+# visualization.py
 import streamlit as st
 import pandas as pd
-import requests
-from bs4 import BeautifulSoup
 import plotly.express as px
-import pydeck as pdk
 
-# Function to scrape data
-def scrape_data():
-    url = 'https://en.wikipedia.org/wiki/List_of_largest_companies_in_the_United_States_by_revenue'
-    page = requests.get(url)
-    soup = BeautifulSoup(page.text, 'html.parser')
-    table = soup.find_all('table')[1]  # Assuming the table you want is the second one on the page
-    column_names = [th.text.strip() for th in table.find_all('th')]
-    data = []
-    for row in table.find_all('tr')[1:]:
-        row_data = [td.text.strip() for td in row.find_all('td')]
-        data.append(row_data)
-    df = pd.DataFrame(data, columns=column_names)
-    return df
-
-# Function to clean and prepare data
-def clean_data(df):
-    df['Revenue (USD millions)'] = df['Revenue (USD millions)'].str.replace(',', '').astype(float)
-    df['Employees'] = df['Employees'].str.replace(',', '')  # Remove commas
-    df['Employees'] = df['Employees'].str.extract('(\d+)').astype(float)  # Extract numeric values
-    df['Revenue growth'] = df['Revenue growth'].str.rstrip('%').astype(float)  # Remove '%' and convert to float
-    return df
-
-# Function to perform analysis and visualization
-def analyze_data(df):    
+def visualize_data(df):
     # Sidebar navigation
     st.sidebar.title("Navigation")
     analysis_option = st.sidebar.radio("Select Analysis", ("Introduction", "Top Companies", "Filtered Data",
@@ -205,17 +180,3 @@ def filter_data(df):
         return filtered_df
     else:
         return df
-
-def main():
-    st.set_page_config(
-        page_title="US Companies Analysis",
-        page_icon=":chart_with_upwards_trend:",
-        layout="wide"
-    )
-    st.title("Largest Companies in the United States by Revenue")
-    df = scrape_data()
-    df = clean_data(df)
-    analyze_data(df)
-
-if __name__ == "__main__":
-    main()

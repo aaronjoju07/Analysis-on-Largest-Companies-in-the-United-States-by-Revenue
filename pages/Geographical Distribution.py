@@ -66,7 +66,14 @@ def main():
     st.title("Largest Companies in the United States by Revenue")
     df = scrape_data()
     df = clean_data(df)
-    df_with_coordinates = merge_data_with_coordinates(df)
+
+    # Sidebar filter by industry
+    industries = ['All'] + list(df['Industry'].unique())
+    selected_industry = st.selectbox("Select Industry", industries)
+
+    filtered_df = df if selected_industry == 'All' else df[df['Industry'] == selected_industry]
+
+    df_with_coordinates = merge_data_with_coordinates(filtered_df)
     plot_map(df_with_coordinates)
 
 if __name__ == "__main__":
