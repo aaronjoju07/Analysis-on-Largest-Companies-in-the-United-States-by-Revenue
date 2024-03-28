@@ -19,3 +19,8 @@ This web application analyzes the largest companies in the United States by reve
 - BeautifulSoup: For web scraping.
 - PyDeck: For visualizing geographical data on maps.
 - Plotly Express: For interactive data visualization.
+
+
+```
+streamlit run Analysis.py
+```
