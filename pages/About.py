@@ -1,10 +1,12 @@
 import streamlit as st
 
 st.set_page_config(
-        page_title="US Companies Analysis",
-        page_icon=":chart_with_upwards_trend:",
-        layout="wide"
+    page_title="US Companies Analysis",
+    page_icon=":chart_with_upwards_trend:",
+    layout="wide",
+    initial_sidebar_state="collapsed",
     )
+
 st.markdown("""
     ## About This App
     

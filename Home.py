@@ -1,8 +1,9 @@
 import streamlit as st
 import pandas as pd
-from bs4 import BeautifulSoup
 import requests
+from bs4 import BeautifulSoup
 import plotly.express as px
+import pydeck as pdk
 
 # Function to scrape data
 def scrape_data():
@@ -30,8 +31,8 @@ def clean_data(df):
 def analyze_data(df):    
     # Sidebar navigation
     st.sidebar.title("Navigation")
-    analysis_option = st.sidebar.radio("Select Analysis", ("Introduction", "Top Companies", "Filtered Data", "Industry Distribution", 
-                                                           "Revenue Analysis", "Employee Analysis", "Geographical Analysis", 
+    analysis_option = st.sidebar.radio("Select Analysis", ("Introduction", "Top Companies", "Filtered Data",
+                                                           "Revenue Analysis", "Employee Analysis",
                                                            "Industry Comparison", "Growth Analysis", "Correlation Analysis"))
     
     if analysis_option == "Introduction":
@@ -76,19 +77,59 @@ def analyze_data(df):
         # Line chart for Revenue Trends of Top Companies
         fig_line_chart = px.line(top_companies, x='Rank', y='Revenue (USD millions)', title='Revenue Trends of Top Companies')
         st.plotly_chart(fig_line_chart)
-    
-    elif analysis_option == "Filtered Data":
-        industries = df['Industry'].unique()
-        selected_industries = st.sidebar.multiselect("Select Industries", industries)
-        if selected_industries:
-            filtered_df = df[df['Industry'].isin(selected_industries)]
-            st.subheader("Filtered Data:")
-            st.write(filtered_df)
-    
-    elif analysis_option == "Industry Distribution":
         st.subheader("Industry Distribution:")
         industry_distribution = df['Industry'].value_counts()
-        st.write(industry_distribution)
+        # st.write(industry_distribution)
+         # Bar chart for Industry Distribution
+        fig_industry_distribution = px.bar(x=industry_distribution.index, y=industry_distribution.values, labels={'x': 'Industry', 'y': 'Count'}, title='Industry Distribution')
+        st.plotly_chart(fig_industry_distribution)
+    
+    elif analysis_option == "Filtered Data":
+        filtered_df = filter_data(df)
+        if not filtered_df.empty:
+            st.subheader("Filtered Data Analysis:")
+            st.markdown("In this section, we analyze the data based on the selected industries.")
+
+            revenue_analysis_placeholder = st.empty()
+            employee_analysis_placeholder = st.empty()
+            industry_comparison_placeholder = st.empty()
+            growth_analysis_placeholder = st.empty()
+
+            with revenue_analysis_placeholder:
+                st.subheader("Revenue Analysis")
+                fig_revenue_trends = px.bar(filtered_df, x='Industry', y='Revenue (USD millions)', title='Revenue Trends Across Industries')
+                st.plotly_chart(fig_revenue_trends)
+
+                top_companies_revenue = filtered_df.sort_values(by='Revenue (USD millions)', ascending=False).head(3)
+                st.markdown("### Top Three Companies by Revenue:")
+                st.table(top_companies_revenue[['Rank', 'Name', 'Revenue (USD millions)']])
+
+            with employee_analysis_placeholder:
+                st.subheader("Employee Analysis")
+                fig_employee_distribution = px.bar(filtered_df, x='Industry', y='Employees', title='Employee Distribution Across Industries')
+                st.plotly_chart(fig_employee_distribution)
+
+                top_companies_employees = filtered_df.sort_values(by='Employees', ascending=False).head(3)
+                st.markdown("### Top Three Companies by Employee Count:")
+                st.table(top_companies_employees[['Rank', 'Name', 'Employees']])
+
+            with industry_comparison_placeholder:
+                st.subheader("Industry Comparison")
+                fig_industry_comparison = px.scatter(filtered_df, x='Revenue (USD millions)', y='Employees', color='Industry', title='Industry Comparison: Revenue vs Employees')
+                st.plotly_chart(fig_industry_comparison)
+
+            with growth_analysis_placeholder:
+                st.subheader("Growth Analysis")
+                fig_growth_analysis_line = px.line(filtered_df, x='Rank', y='Revenue growth', color='Industry', title='Growth Analysis: Revenue Growth by Rank')
+                st.plotly_chart(fig_growth_analysis_line)
+
+                fig_growth_analysis_bar = px.bar(filtered_df, x='Industry', y='Revenue growth', title='Growth Analysis: Revenue Growth by Industry')
+                st.plotly_chart(fig_growth_analysis_bar)
+
+        else:
+            st.write("No data available for selected filters.")
+
+
     
     elif analysis_option == "Revenue Analysis":
         filtered_df = filter_data(df)
@@ -125,16 +166,6 @@ def analyze_data(df):
             st.table(least_companies[['Rank', 'Name', 'Employees']])
         else:
             st.write("No data available for selected filters.")
-
-    
-    elif analysis_option == "Geographical Analysis":
-        filtered_df = filter_data(df)
-        if not filtered_df.empty:
-            fig_geographical_distribution = px.scatter_geo(filtered_df, locations='Headquarters', locationmode='USA-states', title='Geographical Distribution of Headquarters')
-            st.plotly_chart(fig_geographical_distribution)
-        else:
-            st.write("No data available for selected filters.")
-    
     elif analysis_option == "Industry Comparison":
         filtered_df = filter_data(df)
         if not filtered_df.empty:
@@ -154,10 +185,6 @@ def analyze_data(df):
             # Clustered Column Chart
             fig_growth_analysis_bar = px.bar(df, x='Industry', y='Revenue growth', title='Growth Analysis: Revenue Growth by Industry')
             st.plotly_chart(fig_growth_analysis_bar)
-
-
-            # st.markdown("### Analysis of Growth Analysis Chart Data:")
-            # st.markdown("The scatter plot above shows the relationship between revenue growth and the number of employees for different industries. From the chart, we can observe... (add your analysis here)")
 
         else:
             st.write("No data available for selected filters.")
