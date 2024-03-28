@@ -2,10 +2,12 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objs as go
+
 
 def visualize_data(df):
     # Sidebar navigation
-    st.sidebar.title("Navigation")
+    st.sidebar.title("Menu")
     analysis_option = st.sidebar.radio("Select Analysis", ("Introduction", "Top Companies", "Filtered Data",
                                                            "Revenue Analysis", "Employee Analysis",
                                                             "Growth Analysis", "Correlation Analysis"))
@@ -16,6 +18,7 @@ def visualize_data(df):
         ### Introduction
         This website analyzes the largest companies in the United States by revenue. You can explore various aspects of these companies, including revenue trends, employee distribution, industry comparison, and more.
         """)
+        
         st.markdown("""
         ### Data Overview
         Here's an overview of the scraped data
@@ -53,6 +56,32 @@ def visualize_data(df):
         st.plotly_chart(fig_line_chart)
         
         st.write(top_companies)
+
+        # 3D Scatter plot for Top Companies
+        fig_3d = go.Figure(data=[go.Scatter3d(
+            x=top_companies['Revenue (USD millions)'],
+            y=top_companies['Employees'],
+            z=top_companies['Rank'],
+            text=top_companies['Name'],
+            mode='markers',
+            marker=dict(
+                size=12,
+                color=top_companies['Revenue (USD millions)'], 
+                colorscale='Viridis',  
+                opacity=0.8
+            )
+        )])
+
+        fig_3d.update_layout(
+            scene=dict(
+                xaxis=dict(title='Revenue (USD millions)'),
+                yaxis=dict(title='Employees'),
+                zaxis=dict(title='Rank'),
+            ),
+            title='Top Companies in 3D Space'
+        )
+
+        st.plotly_chart(fig_3d)
         
         st.subheader("Industry Distribution:")
         industry_distribution = df['Industry'].value_counts()
@@ -162,7 +191,18 @@ def visualize_data(df):
             # Clustered Column Chart
             fig_growth_analysis_bar = px.bar(df, x='Industry', y='Revenue growth', title='Growth Analysis: Revenue Growth by Industry')
             st.plotly_chart(fig_growth_analysis_bar)
-
+            # 3D Scatter plot for Growth Analysis
+            fig_growth_3d = px.scatter_3d(filtered_df, x='Revenue (USD millions)', y='Employees', z='Revenue growth',
+                                        color='Industry', size_max=40, opacity=0.7,
+                                        title='Growth Analysis: Revenue, Employees, and Growth by Industry')    
+            fig_growth_3d.update_layout(scene=dict(
+                xaxis_title='Revenue (USD millions)',
+                yaxis_title='Employees',
+                zaxis_title='Revenue Growth'
+            ))
+            fig_growth_3d.update_layout(width=800, height=600)
+            st.plotly_chart(fig_growth_3d)
+            
         else:
             st.write("No data available for selected filters.")
     
