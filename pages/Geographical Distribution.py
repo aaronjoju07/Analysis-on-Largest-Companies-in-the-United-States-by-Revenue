@@ -43,7 +43,7 @@ def plot_map(df):
         "ScatterplotLayer",
         data=df,
         get_position=['Longitude', 'Latitude'],
-        get_radius=20000,
+        get_radius=15000,
         get_fill_color=[45, 50, 80],
         pickable=True
     )
@@ -51,10 +51,11 @@ def plot_map(df):
     deck = pdk.Deck(
         layers=[layer],
         initial_view_state=view_state,
-        map_style='light'  # Set map style to light
+        map_style='light'
     )
 
     st.pydeck_chart(deck)
+
 
 def main():
     st.set_page_config(
