@@ -63,7 +63,7 @@ def main():
     layout="wide",
     initial_sidebar_state="collapsed",
     )
-    st.title("Largest Companies in the United States by Revenue")
+    st.title("Top Revenue Generating Corporations in the USA")
     df = scrape_data()
     df = clean_data(df)
 
@@ -71,7 +71,13 @@ def main():
     industries = ['All'] + list(df['Industry'].unique())
     selected_industry = st.selectbox("Select Industry", industries)
 
+    # Sidebar filter by revenue
+    min_revenue = df['Revenue (USD millions)'].min()
+    max_revenue = df['Revenue (USD millions)'].max()
+    revenue_range = st.slider("Select Revenue Range (USD millions)", min_revenue, max_revenue, (min_revenue, max_revenue))
+
     filtered_df = df if selected_industry == 'All' else df[df['Industry'] == selected_industry]
+    filtered_df = filtered_df[(filtered_df['Revenue (USD millions)'] >= revenue_range[0]) & (filtered_df['Revenue (USD millions)'] <= revenue_range[1])]
 
     df_with_coordinates = merge_data_with_coordinates(filtered_df)
     plot_map(df_with_coordinates)

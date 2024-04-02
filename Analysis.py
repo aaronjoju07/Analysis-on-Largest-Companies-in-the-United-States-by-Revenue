@@ -10,7 +10,7 @@ def main():
         page_icon=":chart_with_upwards_trend:",
         layout="wide"
     )
-    st.title("Largest Companies in the United States by Revenue")
+    st.title("Top Revenue Generating Corporations in the USA")
     df = scrape_data()
     df = clean_data(df)
     visualize_data(df)

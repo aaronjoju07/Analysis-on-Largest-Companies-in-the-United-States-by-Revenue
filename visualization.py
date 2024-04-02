@@ -10,7 +10,7 @@ def visualize_data(df):
     st.sidebar.title("Menu")
     analysis_option = st.sidebar.radio("Select Analysis", ("Introduction", "Top Companies", "Filtered Data",
                                                            "Revenue Analysis", "Employee Analysis",
-                                                            "Growth Analysis", "Correlation Analysis"))
+                                                            "Growth Analysis"))
     
     if analysis_option == "Introduction":
         st.sidebar.success("Select an analysis option from the sidebar.")
