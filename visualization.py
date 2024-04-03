@@ -140,6 +140,7 @@ def visualize_data(df):
     elif analysis_option == "Revenue Analysis":
         filtered_df = filter_data(df)
         if not filtered_df.empty:
+            # Bar chart for revenue trends across industries
             fig_revenue_trends = px.bar(filtered_df, x='Industry', y='Revenue (USD millions)', title='Revenue Trends Across Industries')
             st.plotly_chart(fig_revenue_trends)
 
@@ -147,11 +148,13 @@ def visualize_data(df):
             top_companies = filtered_df.sort_values(by='Revenue (USD millions)', ascending=False).head(3)
             least_companies = filtered_df.sort_values(by='Revenue (USD millions)').head(2)
 
-            st.markdown("### Top Three Companies by Revenue:")
-            st.table(top_companies[['Rank', 'Name', 'Revenue (USD millions)']])
+            # Donut chart for top three companies by revenue
+            fig_donut = px.pie(top_companies, values='Revenue (USD millions)', names='Name', hole=0.4, title='Top Three Companies by Revenue')
+            st.plotly_chart(fig_donut)
 
             st.markdown("### Least Two Companies by Revenue:")
             st.table(least_companies[['Rank', 'Name', 'Revenue (USD millions)']])
+
         else:
             st.write("No data available for selected filters.")
     
@@ -165,8 +168,10 @@ def visualize_data(df):
             top_companies = filtered_df.sort_values(by='Employees', ascending=False).head(3)
             least_companies = filtered_df.sort_values(by='Employees').head(2)
 
-            st.markdown("### Top Three Companies by Employee Count:")
-            st.table(top_companies[['Rank', 'Name', 'Employees']])
+            # Donut chart for top three companies by employee count
+            fig_donut_employee = px.pie(top_companies, values='Employees', names='Name', hole=0.4, title='Top Three Companies by Employee Count')
+            st.plotly_chart(fig_donut_employee)
+
 
             st.markdown("### Least Two Companies by Employee Count:")
             st.table(least_companies[['Rank', 'Name', 'Employees']])
@@ -183,8 +188,6 @@ def visualize_data(df):
     elif analysis_option == "Growth Analysis":
         filtered_df = filter_data(df)
         if not filtered_df.empty:
-            # Different graph for growth analysis
-            # Multi-Line Chart
             fig_growth_analysis_line = px.line(filtered_df, x='Rank', y='Revenue growth', color='Industry', title='Growth Analysis: Revenue Growth by Rank')
             st.plotly_chart(fig_growth_analysis_line)
 
