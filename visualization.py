@@ -78,7 +78,7 @@ def visualize_data(df):
                 yaxis=dict(title='Employees'),
                 zaxis=dict(title='Rank'),
             ),
-            title='Top Companies in 3D Space'
+            title='Exploration of Top Companies: Revenue, Employees, and Rank'
         )
 
         st.plotly_chart(fig_3d)
